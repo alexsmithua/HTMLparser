@@ -1,0 +1,25 @@
+from html.parser import HTMLParser
+from urllib.request import urlopen
+
+class MyHTMLParser(HTMLParser):
+    def __init__(self, site_name, *args, **kwargs):
+        self.links = []
+        self.site_name = site_name
+        #super(MyHTMLParser, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.feed(self.read_site_content())
+        self.write_to_file()
+
+    def validate(self,link):
+        return link in self.links or '#' in link or 'javascript:' in link
+
+    def read_site_content(self):
+        return str(urlopen(self.site_name).read())
+
+    def write_to_file(self):
+        f = print
+        f = open('links.txt', 'w')
+        f.write('\n'.join(sorted(self.links)))
+        f.close()
+
+parser = MyHTMLParser("https://www.vk.com")
